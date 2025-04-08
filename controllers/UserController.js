@@ -1,37 +1,67 @@
-const User = require('../models/userModel');
+const userModel = require('../models/userModel');
 
-exports.getUsers = (req, res) => {
-  User.getAllUsers((err, data) => {
-    if (err) return res.status(500).send('Error fetching users');
-    res.status(200).json(data);
-  });
+const getUsers = async (req, res) => {
+    try {
+        const users = await userModel.getAllUsers();
+        res.json(users);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
 };
 
-exports.getUserById = (req, res) => {
-  User.getUserById(req.params.id, (err, user) => {
-    if (err) return res.status(500).send('Error fetching user');
-    if (!user) return res.status(404).send('User not found');
-    res.status(200).json(user); 
-  });
+const getUser = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const user = await userModel.getUserById(Number(id));
+        if (!user) {
+            return res.status(404).send();
+        }
+        res.json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
 };
 
-exports.createUser = (req, res) => {
-  User.createUser(req.body, (err, newUser) => {
-    if (err) return res.status(500).send('Error creating user');
-    res.status(201).json(newUser);
-  });
+const createUser = async (req, res) => {
+    const { name, email } = req.body;
+    try {
+        const newUser = await userModel.createUser({ name, email });
+        res.status(201).json(newUser);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
 };
 
-exports.updateUser = (req, res) => {
-  User.updateUser(req.params.id, req.body, (err, result) => {
-    if (err) return res.status(500).send('Error updating user');
-    res.status(200).json({ message: 'User updated successfully' });
-  });
+const updateUser = async (req, res) => {
+    const { id } = req.params;
+    const { name, email } = req.body;
+    try {
+        const updatedUser = await userModel.updateUser(Number(id), { name, email });
+        if (!updatedUser) {
+            return res.status(404).send();
+        }
+        res.json(updatedUser);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
 };
 
-exports.deleteUser = (req, res) => {
-  User.deleteUser(req.params.id, (err, result) => {
-    if (err) return res.status(500).send('Error deleting user');
-    res.status(200).json({ message: 'User deleted successfully' });
-  });
+const deleteUser = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const success = await userModel.deleteUser(Number(id));
+        if (!success) {
+            return res.status(404).send();
+        }
+        res.status(204).send();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
 };
+
+module.exports = { getUsers, getUser, createUser, updateUser, deleteUser };

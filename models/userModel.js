@@ -1,40 +1,33 @@
-const db = require('../models/db');
+const db = require('../models/db');  
 
-const User = {
-  getAllUsers: (callback) => {
-    db.query('SELECT * FROM users', (err, results) => {
-      if (err) return callback(err);
-      callback(null, results);
-    });
-  },
-
-  getUserById: (id, callback) => {
-    db.query('SELECT * FROM users WHERE id = ?', [id], (err, results) => {
-      if (err) return callback(err);
-      callback(null, results[0]);
-    });
-  },
-
-  createUser: (userData, callback) => {
-    db.query('INSERT INTO users SET ?', userData, (err, result) => {
-      if (err) return callback(err);
-      callback(null, { id: result.insertId, ...userData });
-    });
-  },
-
-  updateUser: (id, userData, callback) => {
-    db.query('UPDATE users SET ? WHERE id = ?', [userData, id], (err, result) => {
-      if (err) return callback(err);
-      callback(null, result);
-    });
-  },
-
-  deleteUser: (id, callback) => {
-    db.query('DELETE FROM users WHERE id = ?', [id], (err, result) => {
-      if (err) return callback(err);
-      callback(null, result);
-    });
-  }
+const getAllUsers = async () => {
+    const [rows] = await db.execute('SELECT * FROM users');
+    return rows;
 };
 
-module.exports = User;
+const getUserById = async (id) => {
+    const [rows] = await db.execute('SELECT * FROM users WHERE id = ?', [id]);
+    return rows[0];  
+};
+
+const createUser = async ({ name, email }) => {
+    const [result] = await db.execute('INSERT INTO users (name, email) VALUES (?, ?)', [name, email]);
+    return { id: result.insertId, name, email };  
+};
+
+const updateUser = async (id, { name, email }) => {
+    const [result] = await db.execute(
+        'UPDATE users SET name = ?, email = ? WHERE id = ?',
+        [name, email, id]
+    );
+    if (result.affectedRows === 0) return null;  
+    return { id, name, email };  
+};
+
+
+const deleteUser = async (id) => {
+    const [result] = await db.execute('DELETE FROM users WHERE id = ?', [id]);
+    return result.affectedRows > 0;  
+};
+
+module.exports = { getAllUsers, getUserById, createUser, updateUser, deleteUser };
