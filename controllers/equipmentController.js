@@ -1,52 +1,53 @@
-const equipmentModel = require('../models/equipmentModel'); 
+
+const equipmentModel = require('../models/equipmentModel');
 
 const getAllEquipements = async (req, res) => {
     try {
-        const equipment = await equipmentModel.getAllEquipements();
-        res.json(equipment);
+        const users = await equipmentModel.getAllEquipements();
+        res.json(users);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: 'Error deleting equipement'});
     }
 };
 
 const getEquipementById = async (req, res) => {
     const { id } = req.params;
     try {
-        const equipment = await equipmentModel.getEquipementById(Number(id));
-        if (!equipment) {
+        const user = await equipmentModel.getEquipementById(Number(id));
+        if (!user) {
             return res.status(404).send();
         }
-        res.json(equipment);
+        res.json(user);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: 'Error deleting equipement'});
     }
 };
 
 const createEquipement = async (req, res) => {
-    const { name, email } = req.body;  
+    const { make, model} = req.body;
     try {
-        const newEquipment = await equipmentModel.createEquipement({ name, email });
-        res.status(201).json(newEquipment);
+        const newUser = await equipmentModel.createEquipement({ make, model});
+        res.status(201).json(newUser);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: 'Error deleting equipement'});
     }
 };
 
 const updateEquipement = async (req, res) => {
     const { id } = req.params;
-    const { name, email } = req.body;
+    const {make, model} = req.body;
     try {
-        const updatedEquipment = await equipmentModel.updateEquipement(Number(id), { name, email });
-        if (!updatedEquipment) {
+        const updatedUser = await equipmentModel.updateEquipement(Number(id), {make, model});
+        if (!updatedUser) {
             return res.status(404).send();
         }
-        res.json(updatedEquipment);
+        res.json(updatedUser);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: 'Error deleting equipement'});
     }
 };
 
@@ -60,8 +61,11 @@ const deleteEquipement = async (req, res) => {
         res.status(204).send();
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({message: 'Error deleting equipement'});
     }
 };
 
 module.exports = { getAllEquipements, getEquipementById, createEquipement, updateEquipement, deleteEquipement };
+
+
+

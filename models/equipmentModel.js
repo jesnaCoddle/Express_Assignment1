@@ -1,4 +1,4 @@
-const db = require('../models/db');  
+const db = require('../models/db.js');  
 
 const getAllEquipements = async () => {
     const [rows] = await db.execute('SELECT * FROM equipment');
@@ -10,18 +10,18 @@ const getEquipementById = async (id) => {
     return rows[0];  
 };
 
-const createEquipement = async ({ name, email }) => {
-    const [result] = await db.execute('INSERT INTO equipment (name, email) VALUES (?, ?)', [name, email]);
-    return { id: result.insertId, name, email };  
+const createEquipement = async ({ make, model}) => {
+    const [result] = await db.execute('INSERT INTO equipment (make, model) VALUES (?, ?)', [make, model]);
+    return { id: result.insertId,make, model};  
 };
 
-const updateEquipement = async (id, { name, email }) => {
+const updateEquipement = async (id, {make, model }) => {
     const [result] = await db.execute(
-        'UPDATE equipment SET name = ?, email = ? WHERE id = ?',
-        [name, email, id]
+        'UPDATE equipment SET make = ?, model = ? WHERE id = ?',
+        [make, model, id]
     );
     if (result.affectedRows === 0) return null;  
-        return { id, name, email };  
+        return { id,make, model };  
 };
 
 const deleteEquipement = async (id) => {

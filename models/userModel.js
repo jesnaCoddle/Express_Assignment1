@@ -1,4 +1,4 @@
-const db = require('../models/db');  
+const db = require('../models/db.js');  
 
 const getAllUsers = async () => {
     const [rows] = await db.execute('SELECT * FROM users');
@@ -10,18 +10,18 @@ const getUserById = async (id) => {
     return rows[0];  
 };
 
-const createUser = async ({ name, email }) => {
-    const [result] = await db.execute('INSERT INTO users (name, email) VALUES (?, ?)', [name, email]);
-    return { id: result.insertId, name, email };  
+const createUser = async ({ first_name, email }) => {
+    const [result] = await db.execute('INSERT INTO users (name, email) VALUES (?, ?)', [first_name, email]);
+    return { id: result.insertId, first_name, email };  
 };
 
-const updateUser = async (id, { name, email }) => {
+const updateUser = async (id, { first_name, email }) => {
     const [result] = await db.execute(
-        'UPDATE users SET name = ?, email = ? WHERE id = ?',
+        'UPDATE users SET first_name = ?, email = ? WHERE id = ?',
         [name, email, id]
     );
     if (result.affectedRows === 0) return null;  
-    return { id, name, email };  
+    return { id, first_name, email };  
 };
 
 

@@ -1,11 +1,13 @@
-
 const express = require('express');
 const app = express();
-const userRoutes = require('./routes/userRoutes'); 
-const equipmentRoutes = require('./routes/equipmentRoutes'); 
+
+const userRoutes = require('./routes/userRoutes.js');
+const equipmentRoutes = require('./routes/equipmentRoutes.js');
+
+const loggerMiddleware = require('./middleware/loggerMiddleware.js');
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(loggerMiddleware);
 
 app.use("/", userRoutes);
 app.use("/", equipmentRoutes);
