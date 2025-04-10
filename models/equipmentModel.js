@@ -1,4 +1,4 @@
-const db = require('../models/db.js');  
+const db = require('./db.js');
 
 const getAllEquipements = async () => {
     const [rows] = await db.execute('SELECT * FROM equipment');
@@ -7,26 +7,30 @@ const getAllEquipements = async () => {
 
 const getEquipementById = async (id) => {
     const [rows] = await db.execute('SELECT * FROM equipment WHERE id = ?', [id]);
-    return rows[0];  
+    return rows[0];
 };
 
-const createEquipement = async ({ make, model}) => {
-    const [result] = await db.execute('INSERT INTO equipment (make, model) VALUES (?, ?)', [make, model]);
-    return { id: result.insertId,make, model};  
-};
-
-const updateEquipement = async (id, {make, model }) => {
+const createEquipement = async ({ make, model, description, daily_rate }) => {
     const [result] = await db.execute(
-        'UPDATE equipment SET make = ?, model = ? WHERE id = ?',
-        [make, model, id]
+        'INSERT INTO equipment (make, model,description, daily_rate) VALUES (?, ?, ?, ?, ?)',
+        [make, model,description , daily_rate]
     );
-    if (result.affectedRows === 0) return null;  
-        return { id,make, model };  
+    return { id: result.insertId, make, model, description, daily_rate };
 };
+
+const updateEquipement = async (id, { make, model, description, daily_rate }) => {
+    const [result] = await db.execute(
+        'UPDATE equipment SET make = ?, model = ?,description = ?, daily_rate = ? WHERE id = ?',
+        [make, model, description, daily_rate, id]
+    );
+    if (result.affectedRows === 0) return null;
+    return { id, make, model, description, daily_rate };
+};
+
 
 const deleteEquipement = async (id) => {
     const [result] = await db.execute('DELETE FROM equipment WHERE id = ?', [id]);
-    return result.affectedRows > 0;  
+    return result.affectedRows > 0;
 };
 
-module.exports = { getAllEquipements, getEquipementById, createEquipement, updateEquipement, deleteEquipement };
+module.exports = { getAllEquipements, getEquipementById,createEquipement,updateEquipement, deleteEquipement};

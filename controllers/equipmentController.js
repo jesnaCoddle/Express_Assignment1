@@ -1,71 +1,87 @@
-
 const equipmentModel = require('../models/equipmentModel');
 
 const getAllEquipements = async (req, res) => {
     try {
-        const users = await equipmentModel.getAllEquipements();
-        res.json(users);
+        const equipments = await equipmentModel.getAllEquipements();
+        res.json(equipments);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error deleting equipement'});
+        res.status(500).json({ message: 'Error fetching equipment' });
     }
 };
 
 const getEquipementById = async (req, res) => {
     const { id } = req.params;
     try {
-        const user = await equipmentModel.getEquipementById(Number(id));
-        if (!user) {
-            return res.status(404).send();
+        const equipment = await equipmentModel.getEquipementById(Number(id));
+        if (!equipment) {
+            return res.status(404).json({ message: 'Equipment not found' });
         }
-        res.json(user);
+        res.json(equipment);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error deleting equipement'});
+        res.status(500).json({ message: 'Error fetching equipment' });
     }
 };
 
 const createEquipement = async (req, res) => {
-    const { make, model} = req.body;
+    const { make, model, description, daily_rate } = req.body;
+
+    if (!make || !model) {
+        return res.status(400).json({ message: 'Make and model are required' });
+    }
+
     try {
-        const newUser = await equipmentModel.createEquipement({ make, model});
-        res.status(201).json(newUser);
+        const newEquipment = await equipmentModel.createEquipement({
+            make,
+            model,
+            description,
+            daily_rate,
+        });
+        res.status(201).json(newEquipment);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error deleting equipement'});
+        res.status(500).json({ message: 'Error creating equipment' });
     }
 };
 
 const updateEquipement = async (req, res) => {
     const { id } = req.params;
-    const {make, model} = req.body;
+    const { make, model,description, daily_rate } = req.body;
+
     try {
-        const updatedUser = await equipmentModel.updateEquipement(Number(id), {make, model});
-        if (!updatedUser) {
-            return res.status(404).send();
+        const updatedEquipment = await equipmentModel.updateEquipement(Number(id), {
+            make,
+            model,
+            description,
+            daily_rate,
+        });
+
+        if (!updatedEquipment) {
+            return res.status(404).json({ message: 'Equipment not found' });
         }
-        res.json(updatedUser);
+
+        res.json(updatedEquipment);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error deleting equipement'});
+        res.status(500).json({ message: 'Error updating equipment' });
     }
 };
+
 
 const deleteEquipement = async (req, res) => {
     const { id } = req.params;
     try {
         const success = await equipmentModel.deleteEquipement(Number(id));
         if (!success) {
-            return res.status(404).send();
+            return res.status(404).json({ message: 'Equipment not found' });
         }
         res.status(204).send();
     } catch (error) {
         console.error(error);
-        res.status(500).json({message: 'Error deleting equipement'});
+        res.status(500).json({ message: 'Error deleting equipment' });
     }
 };
 
-module.exports = { getAllEquipements, getEquipementById, createEquipement, updateEquipement, deleteEquipement };
-
-
-
+module.exports = {getAllEquipements,getEquipementById,createEquipement,updateEquipement,deleteEquipement
+};
