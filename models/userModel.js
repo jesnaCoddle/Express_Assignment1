@@ -17,7 +17,6 @@ const getUserByEmail = async (email) => {
 };
 
 const createUser = async ({ first_name, last_name, email, role, password }) => {
-    const hashedPassword = await bcrypt.hash(password, 10);
     const [result] = await db.execute(
         'INSERT INTO users (first_name, last_name, email, role, password) VALUES (?, ?, ?, ?, ?)',
         [first_name, last_name, email, role, hashedPassword]
@@ -33,6 +32,7 @@ const updateUser = async (id, { first_name, last_name, email, role }) => {
     if (result.affectedRows === 0) return null;
     return { id, first_name, last_name, email, role };
 };
+
 
 const deleteUser = async (id) => {
     const [result] = await db.execute('DELETE FROM users WHERE id = ?', [id]);

@@ -3,7 +3,7 @@ const equipmentModel = require('../models/equipmentModel.js');
 const fetchAllEquipments = async (req, res) => {
     try {
         const equipments = await equipmentModel.getAllEquipments();
-        res.json(equipments);
+        res.send(equipments);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error fetching equipment' });
@@ -17,7 +17,7 @@ const fetchEquipmentById = async (req, res) => {
         if (!equipment) {
             return res.status(404).json({ message: 'Equipment not found' });
         }
-        res.json(equipment);
+        res.send(equipment);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error fetching equipment' });
@@ -35,7 +35,7 @@ const addNewEquipment = async (req, res) => {
     try {
         const existing = await equipmentModel.findByMakeAndModel(make, model);
         if (existing) {
-            return res.status(409).json({ message: 'Equipment with the same make and model already exists' });
+            return res.status(404).json({ message: 'Equipment with the same make and model already exists' });
         }
 
         const newEquipment = await equipmentModel.createEquipment({
@@ -59,7 +59,7 @@ const modifyEquipmentById = async (req, res) => {
     try {
         const existing = await equipmentModel.findByMakeAndModel(make, model);
         if (existing && existing.id !== eqId) {
-            return res.status(409).json({ message: 'Another equipment with the same make and model already exists' });
+            return res.status(404).json({ message: 'Another equipment with the same make and model already exists' });
         }
 
         const updatedEquipment = await equipmentModel.updateEquipment(eqId, {
@@ -88,7 +88,7 @@ const removeEquipmentById = async (req, res) => {
         if (!success) {
             return res.status(404).json({ message: 'Equipment not found' });
         }
-        res.status(204).send();
+        res.status(201).send();
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error deleting equipment' });
