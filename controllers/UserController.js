@@ -3,9 +3,9 @@ const userModel = require('../models/userModel.js');
 const fetchAllUsers = async (req, res) => {
     try {
         const users = await userModel.getAllUsers();
-        res.json(users);
+        res.send(users);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching users' });
+        res.status(500).send({ message: 'Error fetching users' });
     }
 };
 
@@ -15,11 +15,11 @@ const fetchUserById = async (req, res) => {
         const user = await userModel.getUserById(userId);
 
         if (!user) {
-            return res.status(404).json({ error: `User with ID ${userId} not found` });
+            return res.status(404).send({ error: `User with ID ${userId} not found` });
         }
-        res.json(user);
+        res.send(user);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching user' });
+        res.status(500).send({ message: 'Error fetching user' });
     }
 };
 
@@ -28,9 +28,9 @@ const addNewUser = async (req, res) => {
     const { first_name, last_name, email, role, password } = req.body;
     try {
         const newUser = await userModel.createUser({ first_name, last_name, email, role, password });
-        res.status(201).json(newUser);
+        res.status(201).send(newUser);
     } catch (error) {
-        res.status(500).json({ message: 'Error creating user' });
+        res.status(500).send({ message: 'Error creating user' });
     }
 };
 
@@ -40,11 +40,11 @@ const modifyUserById = async (req, res) => {
     try {
         const updatedUser = await userModel.updateUser(userId, { first_name, last_name, email, role });
         if (!updatedUser) {
-            return res.status(404).json({ error: `User with ID ${userId} not found` });
+            return res.status(404).send({ error: `User with ID ${userId} not found` });
         }
-        res.json(updatedUser);
+        res.send(updatedUser);
     } catch (error) {
-        res.status(500).json({ message: 'Error updating user' });
+        res.status(500).send({ message: 'Error updating user' });
     }
 };
 
@@ -53,11 +53,11 @@ const removeUserById = async (req, res) => {
     try {
         const success = await userModel.deleteUser(userId);
         if (!success) {
-            return res.status(404).json({ error: `User with ID ${userId} not found` });
+            return res.status(404).send({ error: `User with ID ${userId} not found` });
         }
         res.status(204).send();
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting user' });
+        res.status(500).send({ message: 'Error deleting user' });
     }
 };
 
