@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const equipmentController = require('../controllers/equipmentController');
+// const verifyToken = require('../controllers/authController');
 
 router.get('/', equipmentController.fetchAllEquipments);
 router.get('/:id', equipmentController.fetchEquipmentById);
@@ -9,3 +10,6 @@ router.patch('/:id', equipmentController.modifyEquipmentById);
 router.delete('/:id', equipmentController.removeEquipmentById);
 
 module.exports = router;
+
+
+

@@ -3,6 +3,9 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
+const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
+
 const loggerMiddleware = require('./middleware/loggerMiddleware');
 const errorHandler = require('./middleware/error');
 
@@ -11,7 +14,7 @@ const equipmentRoutes = require('./routes/equipmentRoutes');
 
 app.use(express.json());
 app.use(loggerMiddleware);
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/api/users', userRoutes);
 app.use('/api/equipment', equipmentRoutes);
