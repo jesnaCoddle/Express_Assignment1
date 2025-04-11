@@ -2,11 +2,10 @@ const express = require('express');
 const router = express.Router();
 const equipmentController = require('../controllers/equipmentController');
 
-
-router.get('/', equipmentController.getAllEquipements);
-router.get('/:id', equipmentController.getEquipementById);
-router.post('/', equipmentController.createEquipement);
-router.patch('/:id', equipmentController.updateEquipement);
-router.delete(':id', equipmentController.deleteEquipement);
+router.get('/', equipmentController.fetchAllEquipments);
+router.get('/:id', equipmentController.fetchEquipmentById);
+router.post('/', equipmentController.addNewEquipment);
+router.patch('/:id', equipmentController.modifyEquipmentById);
+router.delete('/:id', equipmentController.removeEquipmentById);
 
 module.exports = router;

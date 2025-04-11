@@ -1,6 +1,6 @@
-const userModel = require('../models/userModel');
+const userModel = require('../models/userModel.js');
 
-const getUsers = async (req, res, next) => {
+const fetchAllUsers = async (req, res) => {
     try {
         const users = await userModel.getAllUsers();
         res.json(users);
@@ -9,12 +9,13 @@ const getUsers = async (req, res, next) => {
     }
 };
 
-const getUser = async (req, res, next) => {
-    const { id } = req.params;
+const fetchUserById = async (req, res) => {
+    const userId = Number(req.params.id);
     try {
-        const user = await userModel.getUserById(Number(id));
+        const user = await userModel.getUserById(userId);
+
         if (!user) {
-            return res.status(404).json({ error: `User with ID ${id} not found` });
+            return res.status(404).json({ error: `User with ID ${userId} not found` });
         }
         res.json(user);
     } catch (error) {
@@ -22,23 +23,24 @@ const getUser = async (req, res, next) => {
     }
 };
 
-const createUser = async (req, res, next) => {
-    const { first_name, last_name, email, role } = req.body;
+
+const addNewUser = async (req, res) => {
+    const { first_name, last_name, email, role, password } = req.body;
     try {
-        const newUser = await userModel.createUser({ first_name, last_name, email, role });
+        const newUser = await userModel.createUser({ first_name, last_name, email, role, password });
         res.status(201).json(newUser);
     } catch (error) {
         res.status(500).json({ message: 'Error creating user' });
     }
 };
 
-const updateUser = async (req, res, next) => {
-    const { id } = req.params;
+const modifyUserById = async (req, res) => {
+    const userId = Number(req.params.id);
     const { first_name, last_name, email, role } = req.body;
     try {
-        const updatedUser = await userModel.updateUser(Number(id), { first_name, last_name, email, role });
+        const updatedUser = await userModel.updateUser(userId, { first_name, last_name, email, role });
         if (!updatedUser) {
-            return res.status(404).json({ error: `User with ID ${id} not found` });
+            return res.status(404).json({ error: `User with ID ${userId} not found` });
         }
         res.json(updatedUser);
     } catch (error) {
@@ -46,12 +48,12 @@ const updateUser = async (req, res, next) => {
     }
 };
 
-const deleteUser = async (req, res, next) => {
-    const { id } = req.params;
+const removeUserById = async (req, res) => {
+    const userId = Number(req.params.id);
     try {
-        const success = await userModel.deleteUser(Number(id));
+        const success = await userModel.deleteUser(userId);
         if (!success) {
-            return res.status(404).json({ error: `User with ID ${id} not found` });
+            return res.status(404).json({ error: `User with ID ${userId} not found` });
         }
         res.status(204).send();
     } catch (error) {
@@ -59,5 +61,4 @@ const deleteUser = async (req, res, next) => {
     }
 };
 
-
-module.exports = { getUsers, getUser, createUser, updateUser, deleteUser};
+module.exports = { fetchAllUsers, fetchUserById, addNewUser, modifyUserById, removeUserById };

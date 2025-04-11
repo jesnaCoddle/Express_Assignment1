@@ -1,8 +1,8 @@
-const equipmentModel = require('../models/equipmentModel');
+const equipmentModel = require('../models/equipmentModel.js');
 
-const getAllEquipements = async (req, res) => {
+const fetchAllEquipments = async (req, res) => {
     try {
-        const equipments = await equipmentModel.getAllEquipements();
+        const equipments = await equipmentModel.getAllEquipments();
         res.json(equipments);
     } catch (error) {
         console.error(error);
@@ -10,10 +10,10 @@ const getAllEquipements = async (req, res) => {
     }
 };
 
-const getEquipementById = async (req, res) => {
-    const { id } = req.params;
+const fetchEquipmentById = async (req, res) => {
+    const eqId = Number(req.params.id);
     try {
-        const equipment = await equipmentModel.getEquipementById(Number(id));
+        const equipment = await equipmentModel.getEquipmentById(eqId);
         if (!equipment) {
             return res.status(404).json({ message: 'Equipment not found' });
         }
@@ -24,7 +24,8 @@ const getEquipementById = async (req, res) => {
     }
 };
 
-const createEquipement = async (req, res) => {
+
+const addNewEquipment = async (req, res) => {
     const { make, model, description, daily_rate } = req.body;
 
     if (!make || !model) {
@@ -32,12 +33,18 @@ const createEquipement = async (req, res) => {
     }
 
     try {
-        const newEquipment = await equipmentModel.createEquipement({
+        const existing = await equipmentModel.findByMakeAndModel(make, model);
+        if (existing) {
+            return res.status(409).json({ message: 'Equipment with the same make and model already exists' });
+        }
+
+        const newEquipment = await equipmentModel.createEquipment({
             make,
             model,
             description,
             daily_rate,
         });
+
         res.status(201).json(newEquipment);
     } catch (error) {
         console.error(error);
@@ -45,12 +52,17 @@ const createEquipement = async (req, res) => {
     }
 };
 
-const updateEquipement = async (req, res) => {
-    const { id } = req.params;
-    const { make, model,description, daily_rate } = req.body;
+const modifyEquipmentById = async (req, res) => {
+    const eqId = Number(req.params.id);
+    const { make, model, description, daily_rate } = req.body;
 
     try {
-        const updatedEquipment = await equipmentModel.updateEquipement(Number(id), {
+        const existing = await equipmentModel.findByMakeAndModel(make, model);
+        if (existing && existing.id !== eqId) {
+            return res.status(409).json({ message: 'Another equipment with the same make and model already exists' });
+        }
+
+        const updatedEquipment = await equipmentModel.updateEquipment(eqId, {
             make,
             model,
             description,
@@ -68,11 +80,11 @@ const updateEquipement = async (req, res) => {
     }
 };
 
+const removeEquipmentById = async (req, res) => {
+    const eqId = Number(req.params.id);
 
-const deleteEquipement = async (req, res) => {
-    const { id } = req.params;
     try {
-        const success = await equipmentModel.deleteEquipement(Number(id));
+        const success = await equipmentModel.deleteEquipment(eqId);
         if (!success) {
             return res.status(404).json({ message: 'Equipment not found' });
         }
@@ -83,5 +95,4 @@ const deleteEquipement = async (req, res) => {
     }
 };
 
-module.exports = {getAllEquipements,getEquipementById,createEquipement,updateEquipement,deleteEquipement
-};
+module.exports = { fetchAllEquipments, fetchEquipmentById, addNewEquipment, modifyEquipmentById, removeEquipmentById };

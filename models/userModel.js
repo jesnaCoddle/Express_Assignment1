@@ -1,4 +1,5 @@
-const db = require('../models/db.js');
+const db = require('./db.js');
+const bcrypt = require('bcryptjs');
 
 const getAllUsers = async () => {
     const [rows] = await db.execute('SELECT * FROM users');
@@ -10,10 +11,16 @@ const getUserById = async (id) => {
     return rows[0];
 };
 
-const createUser = async ({ first_name, last_name, email, role }) => {
+const getUserByEmail = async (email) => {
+    const [rows] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
+    return rows[0];
+};
+
+const createUser = async ({ first_name, last_name, email, role, password }) => {
+    const hashedPassword = await bcrypt.hash(password, 10);
     const [result] = await db.execute(
-        'INSERT INTO users (first_name, last_name, email, role) VALUES (?, ?, ?, ?)',
-        [first_name, last_name, email, role]
+        'INSERT INTO users (first_name, last_name, email, role, password) VALUES (?, ?, ?, ?, ?)',
+        [first_name, last_name, email, role, hashedPassword]
     );
     return { id: result.insertId, first_name, last_name, email, role };
 };
@@ -32,4 +39,4 @@ const deleteUser = async (id) => {
     return result.affectedRows > 0;
 };
 
-module.exports = { getAllUsers, getUserById, createUser, updateUser, deleteUser };
+module.exports = { getAllUsers, getUserById, createUser, updateUser, deleteUser, getUserByEmail };

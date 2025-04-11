@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const app = express();
@@ -17,24 +18,9 @@ app.use('/api/equipment', equipmentRoutes);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/users', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/user.html'));
-});
-
-app.post('/users', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/index.html'));
-});
-
-
-app.get('/equipment', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/equipment.html'));
-});
-
-
-
 app.use(errorHandler);
 
-const PORT = 3500;
+const PORT = process.env.PORT || 3500;
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });
