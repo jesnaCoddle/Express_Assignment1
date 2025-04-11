@@ -1,5 +1,4 @@
 const db = require('./db.js');
-const bcrypt = require('bcryptjs');
 
 const getAllUsers = async () => {
     const [rows] = await db.execute('SELECT * FROM users');
@@ -16,10 +15,10 @@ const getUserByEmail = async (email) => {
     return rows[0];
 };
 
-const createUser = async ({ first_name, last_name, email, role, password }) => {
+const createUser = async ({ first_name, last_name, email, role }) => {
     const [result] = await db.execute(
-        'INSERT INTO users (first_name, last_name, email, role, password) VALUES (?, ?, ?, ?, ?)',
-        [first_name, last_name, email, role, hashedPassword]
+        'INSERT INTO users (first_name, last_name, email, role) VALUES (?, ?, ?, ?, ?)',
+        [first_name, last_name, email, role]
     );
     return { id: result.insertId, first_name, last_name, email, role };
 };
