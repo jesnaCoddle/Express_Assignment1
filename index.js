@@ -16,10 +16,7 @@ app.use(loggerMiddleware);
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
-  res.status(200).send({
-    message: 'API is working!',
-    status: 'success'
-  });
+  res.send("api is working!");
 });
 
 app.use('/api/auth', authRoutes);
