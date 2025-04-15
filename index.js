@@ -4,18 +4,25 @@ const path = require('path');
 const app = express();
 
 const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
+const loggerMiddleware = require('./middleware/loggerMiddleware.js');
+const errorHandler = require('./middleware/error.js');
 
-const loggerMiddleware = require('./middleware/loggerMiddleware');
-const errorHandler = require('./middleware/error');
-
-const userRoutes = require('./routes/userRoutes');
-const equipmentRoutes = require('./routes/equipmentRoutes');
+const userRoutes = require('./routes/userRoutes.js');
+const equipmentRoutes = require('./routes/equipmentRoutes.js');
+const authRoutes = require('./routes/authRoutes.js');
 
 app.use(express.json());
 app.use(loggerMiddleware);
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.get('/', (req, res) => {
+  res.status(200).send({
+    message: 'API is working!',
+    status: 'success'
+  });
+});
+
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/equipment', equipmentRoutes);
 
@@ -23,7 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3500;
+const PORT = process.env.PORT || 3800;
 app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });

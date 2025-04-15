@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const verifyToken = require('../controllers/authController');
+const authController = require('../controllers/authController.js');
 
+router.post('/login', authController.login);
 
-router.get('/login', verifyToken, (req, res) => {
-    res.status(200).send('This is a protected route');
-});
+module.exports = router;

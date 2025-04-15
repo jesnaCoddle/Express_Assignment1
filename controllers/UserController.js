@@ -5,6 +5,7 @@ const fetchAllUsers = async (req, res) => {
         const users = await userModel.getAllUsers();
         res.send(users);
     } catch (error) {
+        console.error(error); 
         res.status(500).send({ message: 'Error fetching users' });
     }
 };
@@ -19,10 +20,10 @@ const fetchUserById = async (req, res) => {
         }
         res.send(user);
     } catch (error) {
+        console.error(error);
         res.status(500).send({ message: 'Error fetching user' });
     }
 };
-
 
 const addNewUser = async (req, res) => {
     const { first_name, last_name, email, role, password } = req.body;
@@ -30,6 +31,7 @@ const addNewUser = async (req, res) => {
         const newUser = await userModel.createUser({ first_name, last_name, email, role, password });
         res.status(201).send(newUser);
     } catch (error) {
+        console.error(error); 
         res.status(500).send({ message: 'Error creating user' });
     }
 };
@@ -44,6 +46,7 @@ const modifyUserById = async (req, res) => {
         }
         res.send(updatedUser);
     } catch (error) {
+        console.error(error); 
         res.status(500).send({ message: 'Error updating user' });
     }
 };
@@ -57,6 +60,7 @@ const removeUserById = async (req, res) => {
         }
         res.status(204).send();
     } catch (error) {
+        console.error(error); 
         res.status(500).send({ message: 'Error deleting user' });
     }
 };

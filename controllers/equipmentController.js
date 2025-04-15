@@ -2,7 +2,7 @@ const equipmentModel = require('../models/equipmentModel.js');
 
 const fetchAllEquipments = async (req, res) => {
     try {
-        const equipments = await equipmentModel.getAllEquipments();
+        const equipments = await equipmentModel.getAllEquipments(); 
         res.send(equipments);
     } catch (error) {
         console.error(error);
@@ -24,7 +24,6 @@ const fetchEquipmentById = async (req, res) => {
     }
 };
 
-
 const addNewEquipment = async (req, res) => {
     const { make, model, description, daily_rate } = req.body;
 
@@ -33,12 +32,12 @@ const addNewEquipment = async (req, res) => {
     }
 
     try {
-        const existing = await equipmentModel.findByMakeAndModel(make, model);
+        const existing = await equipmentModel.getEquipmentByMakeAndModel(make, model);
         if (existing) {
-            return res.status(404).send({ message: 'Equipment with the same make and model already exists' });
+            return res.status(409).send({ message: 'Equipment with the same make and model already exists' });
         }
 
-        const newEquipment = await equipmentModel.createEquipment({ make, model, description, daily_rate });
+        const newEquipment = await equipmentModel.createEquipment({ make, model, description, daily_rate }); 
 
         res.status(201).send(newEquipment);
     } catch (error) {
@@ -52,12 +51,12 @@ const modifyEquipmentById = async (req, res) => {
     const { make, model, description, daily_rate } = req.body;
 
     try {
-        const existing = await equipmentModel.findByMakeAndModel(make, model);
+        const existing = await equipmentModel.getEquipmentByMakeAndModel(make, model);
         if (existing && existing.id !== eqId) {
-            return res.status(404).send({ message: 'Another equipment with the same make and model already exists' });
+            return res.status(409).send({ message: 'Another equipment with the same make and model already exists' }); 
         }
 
-        const updatedEquipment = await equipmentModel.updateEquipment(eqId, { make, model, description, daily_rate });
+        const updatedEquipment = await equipmentModel.updateEquipment(eqId, { make, model, description, daily_rate }); 
 
         if (!updatedEquipment) {
             return res.status(404).send({ message: 'Equipment not found' });
@@ -78,7 +77,7 @@ const removeEquipmentById = async (req, res) => {
         if (!success) {
             return res.status(404).send({ message: 'Equipment not found' });
         }
-        res.status(201).send();
+        res.status(204).send(); 
     } catch (error) {
         console.error(error);
         res.status(500).send({ message: 'Error deleting equipment' });

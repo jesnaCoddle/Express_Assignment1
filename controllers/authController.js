@@ -1,53 +1,36 @@
-const express = require('express');
 const jwt = require('jsonwebtoken');
-const db = require('./db.js');
-const verifyToken = require('../middleware/verifyToken.js');
+const db = require('../models/db.js');
 
-const router = express.Router();
+const login = (req, res) => {
+    const { first_name, email } = req.body;
 
-router.post('/login', (req, res) => {
-    const { first_name, password } = req.body;
-
-    if (!first_name || !password) {
-        return res.status(400).json({ message: 'first_name and password are required' });
+    if (!first_name || !email) {
+        return res.status(400).json({ message: 'first_name and email are required' });
     }
 
-    const query = `SELECT first_name, password FROM users WHERE first_name = ? AND password=SHA1(?)`;
-
-    db.query(query, [first_name], (err, result) => {
-        if (err || result.length === 0) {
-            return res.status(401).send({ error: "Login failed" });
-        }
+      db.query('SELECT * FROM users WHERE first_name = ?', [first_name], (err, results) => {
+        if (err) return res.status(500).json({ message: 'Database error' });
 
         if (results.length === 0) {
-            return res.status(401).json({ message: 'firstname is invalid' });
+            return res.status(401).json({ message: 'Invalid first_name' });
         }
 
-        const user = {
-            id: result[0].id,
-            first_name: user.first_name
-        };
+        const user = results[0];
 
-        if (user.password !== password) {
-            return res.status(401).json({ message: 'Invalid password' });
+        console.log('DB email:', user.email, '| Entered email:', email);
+
+        if (user.email !== email) {
+            return res.status(401).json({ message: 'Invalid email' });
         }
 
-        const token = jwt.sign(user, process.env.JWT_SECRET_KEY, { expiresIn: '24h' });
+        const token = jwt.sign(
+            { id: user.id, first_name: user.first_name, role: user.role },
+             'mysecret',
+            { expiresIn: '1h' }
+        );
 
-        res.status(200).send({ auth: true, token });
+        res.status(200).json({ token });
     });
-});
+};
 
-router.post('/validate-token', verifyToken, (req, res) => {
-    const user = req.user;
-
-    res.json({
-        message: 'Token is valid',
-        user: {
-            first_name: user.first_name,
-
-        },
-    });
-});
-
-export default router;
+module.exports = { login };
