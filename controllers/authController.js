@@ -8,7 +8,7 @@ const login = (req, res) => {
         return res.status(400).json({ message: 'first_name and email are required' });
     }
 
-      db.query('SELECT * FROM users WHERE first_name = ?', [first_name], (err, results) => {
+    db.query('SELECT * FROM users WHERE first_name = ?', [first_name], (err, results) => {
         if (err) return res.status(500).json({ message: 'Database error' });
 
         if (results.length === 0) {
@@ -17,6 +17,7 @@ const login = (req, res) => {
 
         const user = results[0];
 
+        console.log('DB returned user:', user);
         console.log('DB email:', user.email, '| Entered email:', email);
 
         if (user.email !== email) {
@@ -25,9 +26,10 @@ const login = (req, res) => {
 
         const token = jwt.sign(
             { id: user.id, first_name: user.first_name, role: user.role },
-             'mysecret',
-            { expiresIn: '1h' }
+            'mysecret',
+            { expiresIn: '24h' }
         );
+        console.log(token);
 
         res.status(200).json({ token });
     });

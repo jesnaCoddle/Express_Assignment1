@@ -1,68 +1,77 @@
-const userModel = require('../models/userModel.js');
+
+const db = require('../models/db.js');
 
 const fetchAllUsers = async (req, res) => {
     try {
-        const users = await userModel.getAllUsers();
-        res.send(users);
-    } catch (error) {
-        console.error(error); 
-        res.status(500).send({ message: 'Error fetching users' });
+        const results = await db.query('select * from users');
+        res.send(results);
     }
-};
+    catch (error) {
+        console.error(err);
+        res.send('error fetching books');
+    }
+}
+
 
 const fetchUserById = async (req, res) => {
-    const userId = Number(req.params.id);
+    const id = Number(req.params.id);
     try {
-        const user = await userModel.getUserById(userId);
-
-        if (!user) {
-            return res.status(404).send({ error: `User with ID ${userId} not found` });
-        }
+        const user = await db.query('select * from book where id=' + id);
         res.send(user);
-    } catch (error) {
+    }
+    catch (error) {
         console.error(error);
-        res.status(500).send({ message: 'Error fetching user' });
+        res.send({ message: 'Error fetching user' });
     }
 };
 
 const addNewUser = async (req, res) => {
-    const { first_name, last_name, email, role, password } = req.body;
+    let first_name = req.body.first_name;
+    let last_name = req.body.last_name;
+    let email = req.body.email;
+    let role = req.body.role;
+    let password = req.body.password;
+
     try {
-        const newUser = await userModel.createUser({ first_name, last_name, email, role, password });
-        res.status(201).send(newUser);
+        const [newUser] = await db.query(
+            `INSERT INTO users (first_name, last_name, email, role, password) VALUES ('${first_name}', '${last_name}', '${email}', '${role}', '${password}')`
+        );
+        res.send(newUser);
     } catch (error) {
-        console.error(error); 
-        res.status(500).send({ message: 'Error creating user' });
+        console.error(error);
+        res.send({ message: 'Error creating user' });
     }
 };
 
-const modifyUserById = async (req, res) => {
-    const userId = Number(req.params.id);
-    const { first_name, last_name, email, role } = req.body;
+const updateUserById = async (req, res) => {
+    let first_name = req.body.first_name;
+    let last_name = req.body.last_name;
+    let email = req.body.email;
+    let role = req.body.role;
+    let password = req.body.password;
+    let id = req.body.id;
+
     try {
-        const updatedUser = await userModel.updateUser(userId, { first_name, last_name, email, role });
-        if (!updatedUser) {
-            return res.status(404).send({ error: `User with ID ${userId} not found` });
-        }
+        const [updatedUser] = await con.query(
+            `UPDATE users SET first_name='${first_name}', last_name='${last_name}', email='${email}', role='${role}', password='${password}' WHERE id='${id}'`
+        );
         res.send(updatedUser);
     } catch (error) {
-        console.error(error); 
-        res.status(500).send({ message: 'Error updating user' });
+        console.error(error);
+        res.send({ message: 'Error updating user' });
     }
 };
 
 const removeUserById = async (req, res) => {
-    const userId = Number(req.params.id);
+    const id = Number(req.params.id);
     try {
-        const success = await userModel.deleteUser(userId);
-        if (!success) {
-            return res.status(404).send({ error: `User with ID ${userId} not found` });
-        }
-        res.status(204).send();
+        const [deleteUser] = await con.query(`DELETE FROM users WHERE id = ${id}`);
+        res.send(deleteUser);
     } catch (error) {
-        console.error(error); 
-        res.status(500).send({ message: 'Error deleting user' });
+        console.error(error);
+        res.send({ message: 'Error deleting user' });
     }
 };
 
-module.exports = { fetchAllUsers, fetchUserById, addNewUser, modifyUserById, removeUserById };
+
+module.exports = { fetchAllUsers, fetchUserById, addNewUser, updateUserById, removeUserById };

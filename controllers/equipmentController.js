@@ -1,87 +1,71 @@
-const equipmentModel = require('../models/equipmentModel.js');
+const db = require('../models/db.js')
 
 const fetchAllEquipments = async (req, res) => {
     try {
-        const equipments = await equipmentModel.getAllEquipments(); 
+        const equipments = await db.query('SELECT * FROM equipment');
         res.send(equipments);
     } catch (error) {
         console.error(error);
-        res.status(500).send({ message: 'Error fetching equipment' });
+        res.send({ message: 'Error fetching equipment' });
     }
 };
 
 const fetchEquipmentById = async (req, res) => {
     const eqId = Number(req.params.id);
     try {
-        const equipment = await equipmentModel.getEquipmentById(eqId);
-        if (!equipment) {
-            return res.status(404).json({ message: 'Equipment not found' });
-        }
+        const equipment = await db.query('select * from equipment where id=' + id);
         res.send(equipment);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error fetching equipment' });
+        res.send({ message: 'Error fetching equipment' });
     }
 };
 
 const addNewEquipment = async (req, res) => {
-    const { make, model, description, daily_rate } = req.body;
-
-    if (!make || !model) {
-        return res.status(400).send({ message: 'Make and model are required' });
-    }
+    let make = req.body.make;
+    let model = req.body.model;
+    let description = req.body.description;
+    let daily_rate = req.body.daily_rate;
 
     try {
-        const existing = await equipmentModel.getEquipmentByMakeAndModel(make, model);
-        if (existing) {
-            return res.status(409).send({ message: 'Equipment with the same make and model already exists' });
-        }
+        const [newEq] = await db.query(
+            `INSERT INTO equipment (make, model, description, daily_rate) VALUES ('${make}', '${model}', '${description}', '${daily_rate}')`
+        );
+        res.send(newEq);
 
-        const newEquipment = await equipmentModel.createEquipment({ make, model, description, daily_rate }); 
-
-        res.status(201).send(newEquipment);
     } catch (error) {
         console.error(error);
         res.status(500).send({ message: 'Error creating equipment' });
     }
 };
 
-const modifyEquipmentById = async (req, res) => {
-    const eqId = Number(req.params.id);
-    const { make, model, description, daily_rate } = req.body;
-
+const updateEquipmentById = async (req, res) => {
+    let make = req.body.make;
+    let model = req.body.model;
+    let description = req.body.description;
+    let daily_rate = req.body.daily_rate;
+    let id = req.body.id;
     try {
-        const existing = await equipmentModel.getEquipmentByMakeAndModel(make, model);
-        if (existing && existing.id !== eqId) {
-            return res.status(409).send({ message: 'Another equipment with the same make and model already exists' }); 
-        }
+        const [updatedUser] = await db.query(
+            `UPDATE equipment SET make='${make}', model='${model}', descriptiom='${descriptiom}', daily_rate='${daily_rate}' WHERE id='${id}'`
+        );
+        res.send(updatedUser);
 
-        const updatedEquipment = await equipmentModel.updateEquipment(eqId, { make, model, description, daily_rate }); 
-
-        if (!updatedEquipment) {
-            return res.status(404).send({ message: 'Equipment not found' });
-        }
-
-        res.send(updatedEquipment);
     } catch (error) {
         console.error(error);
-        res.status(500).send({ message: 'Error updating equipment' });
+        res.send({ message: 'Error updating equipment' });
     }
 };
 
 const removeEquipmentById = async (req, res) => {
-    const eqId = Number(req.params.id);
-
+    const id = Number(req.params.id);
     try {
-        const success = await equipmentModel.deleteEquipment(eqId);
-        if (!success) {
-            return res.status(404).send({ message: 'Equipment not found' });
-        }
-        res.status(204).send(); 
+        const [deleteEq] = await db.query(`DELETE FROM equipment WHERE id = ${id}`);
+        res.send(deleteEq);
     } catch (error) {
         console.error(error);
-        res.status(500).send({ message: 'Error deleting equipment' });
+        res.send({ message: 'Error deleting equipment' });
     }
 };
 
-module.exports = { fetchAllEquipments, fetchEquipmentById, addNewEquipment, modifyEquipmentById, removeEquipmentById };
+module.exports = { fetchAllEquipments, fetchEquipmentById, addNewEquipment, updateEquipmentById, removeEquipmentById };
