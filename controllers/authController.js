@@ -7,20 +7,20 @@ const login = async (req, res) => {
 
 
     if (!first_name || !email) {
-        return res.status(400).json({ message: 'first_name and email are required' });
+        return res.json({ message: 'first_name and email are required' });
     }
 
     try {
         const [results] = await db.query('SELECT * FROM users WHERE first_name = ?', [first_name]);
 
         if (results.length === 0) {
-            return res.status(404).json({ message: 'Invalid first_name' });
+            return res.json({ message: 'Invalid first_name' });
         }
 
         const user = results[0];
 
         if (user.email !== email) {
-            return res.status(401).json({ message: 'Invalid email' });
+            return res.json({ message: 'Invalid email' });
         }
 
         const token = jwt.sign(
@@ -32,7 +32,7 @@ const login = async (req, res) => {
         res.json({ token });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Database error' });
+        res.json({ message: 'Database error' });
     }
 };
 

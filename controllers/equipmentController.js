@@ -32,7 +32,7 @@ const addNewEquipment = async (req, res) => {
         res.send({ message: 'Equipment added successfully'});
     } catch (error) {
         console.error(error);
-        res.status(500).send({ message: 'Error creating equipment' });
+        res.send({ message: 'Error creating equipment' });
     }
 };
 
