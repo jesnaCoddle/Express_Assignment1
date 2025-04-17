@@ -1,27 +1,26 @@
 const jwt = require('jsonwebtoken');
 const db = require('../models/db.js');
 
-const login = (req, res) => {
-    const { first_name, email } = req.body;
+const login = async (req, res) => {
+    let first_name = req.body.first_name;
+    let email = req.body.email;
+
 
     if (!first_name || !email) {
-        return res.json({ message: 'first_name and email are required' });
+        return res.status(400).json({ message: 'first_name and email are required' });
     }
 
-    db.query('SELECT * FROM users WHERE first_name = ?', [first_name], (err, results) => {
-        if (err) return res.json({ message: 'Database error' });
+    try {
+        const [results] = await db.query('SELECT * FROM users WHERE first_name = ?', [first_name]);
 
         if (results.length === 0) {
-            return res.json({ message: 'Invalid first_name' });
+            return res.status(404).json({ message: 'Invalid first_name' });
         }
 
         const user = results[0];
 
-        console.log('DB returned user:', user);
-        console.log('DB email:', user.email, '| Entered email:', email);
-
         if (user.email !== email) {
-            return res.json({ message: 'Invalid email' });
+            return res.status(401).json({ message: 'Invalid email' });
         }
 
         const token = jwt.sign(
@@ -29,10 +28,12 @@ const login = (req, res) => {
             'mysecret',
             { expiresIn: '24h' }
         );
-        console.log(token);
 
         res.json({ token });
-    });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Database error' });
+    }
 };
 
 module.exports = { login };

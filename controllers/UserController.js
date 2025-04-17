@@ -1,4 +1,3 @@
-
 const db = require('../models/db.js');
 
 const fetchAllUsers = async (req, res) => {
