@@ -1,8 +1,8 @@
-const db = require('../models/db.js')
+const db = require('../models/db.js');
 
 const fetchAllEquipments = async (req, res) => {
     try {
-        const equipments = await db.query('SELECT * FROM equipment');
+        const [equipments] = await db.query('SELECT * FROM equipment');
         res.send(equipments);
     } catch (error) {
         console.error(error);
@@ -11,9 +11,9 @@ const fetchAllEquipments = async (req, res) => {
 };
 
 const fetchEquipmentById = async (req, res) => {
-    const eqId = Number(req.params.id);
+    const id = Number(req.params.id);
     try {
-        const equipment = await db.query('select * from equipment where id=' + id);
+        const [equipment] = await db.query('SELECT * FROM equipment WHERE id = ?', [id]);
         res.send(equipment);
     } catch (error) {
         console.error(error);
@@ -22,17 +22,14 @@ const fetchEquipmentById = async (req, res) => {
 };
 
 const addNewEquipment = async (req, res) => {
-    let make = req.body.make;
-    let model = req.body.model;
-    let description = req.body.description;
-    let daily_rate = req.body.daily_rate;
+    let { make, model, description, daily_rate } = req.body;
 
     try {
         const [newEq] = await db.query(
-            `INSERT INTO equipment (make, model, description, daily_rate) VALUES ('${make}', '${model}', '${description}', '${daily_rate}')`
+            'INSERT INTO equipment (make, model, description, daily_rate) VALUES (?, ?, ?, ?)',
+            [make, model, description, daily_rate]
         );
-        res.send(newEq);
-
+        res.send({ message: 'Equipment added successfully'});
     } catch (error) {
         console.error(error);
         res.status(500).send({ message: 'Error creating equipment' });
@@ -40,17 +37,13 @@ const addNewEquipment = async (req, res) => {
 };
 
 const updateEquipmentById = async (req, res) => {
-    let make = req.body.make;
-    let model = req.body.model;
-    let description = req.body.description;
-    let daily_rate = req.body.daily_rate;
-    let id = req.body.id;
+    let { make, model, description, daily_rate, id } = req.body;
     try {
-        const [updatedUser] = await db.query(
-            `UPDATE equipment SET make='${make}', model='${model}', descriptiom='${descriptiom}', daily_rate='${daily_rate}' WHERE id='${id}'`
+        const [updatedEq] = await db.query(
+            'UPDATE equipment SET make = ?, model = ?, description = ?, daily_rate = ? WHERE id = ?',
+            [make, model, description, daily_rate, id]
         );
-        res.send(updatedUser);
-
+        res.send({ message: 'Equipment updated'});
     } catch (error) {
         console.error(error);
         res.send({ message: 'Error updating equipment' });
@@ -60,12 +53,18 @@ const updateEquipmentById = async (req, res) => {
 const removeEquipmentById = async (req, res) => {
     const id = Number(req.params.id);
     try {
-        const [deleteEq] = await db.query(`DELETE FROM equipment WHERE id = ${id}`);
-        res.send(deleteEq);
+        const [deleteEq] = await db.query('DELETE FROM equipment WHERE id = ?', [id]);
+        res.send({ message: 'Equipment deleted'});
     } catch (error) {
         console.error(error);
         res.send({ message: 'Error deleting equipment' });
     }
 };
 
-module.exports = { fetchAllEquipments, fetchEquipmentById, addNewEquipment, updateEquipmentById, removeEquipmentById };
+module.exports = {
+    fetchAllEquipments,
+    fetchEquipmentById,
+    addNewEquipment,
+    updateEquipmentById,
+    removeEquipmentById
+};
