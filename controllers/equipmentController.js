@@ -1,8 +1,8 @@
-const db = require('../models/db.js');
+const con = require('../models/equipmentModel');
 
 const fetchAllEquipments = async (req, res) => {
     try {
-        const [equipments] = await db.query('SELECT * FROM equipment');
+        const [equipments] = await con.fetchEquipments();
         res.send(equipments);
     } catch (error) {
         console.error(error);
@@ -13,7 +13,7 @@ const fetchAllEquipments = async (req, res) => {
 const fetchEquipmentById = async (req, res) => {
     const id = Number(req.params.id);
     try {
-        const [equipment] = await db.query('SELECT * FROM equipment WHERE id = ?', [id]);
+        const [equipment] = await con.fetchEquipment([id]);
         res.send(equipment);
     } catch (error) {
         console.error(error);
@@ -25,11 +25,9 @@ const addNewEquipment = async (req, res) => {
     let { make, model, description, daily_rate } = req.body;
 
     try {
-        const [newEq] = await db.query(
-            'INSERT INTO equipment (make, model, description, daily_rate) VALUES (?, ?, ?, ?)',
-            [make, model, description, daily_rate]
-        );
-        res.send({ message: 'Equipment added successfully'});
+        const [newEq] = await con.addEquipment(make, model, description, daily_rate);
+        res.send(newEq);
+        res.send({ message: 'Equipment added successfully' });
     } catch (error) {
         console.error(error);
         res.send({ message: 'Error creating equipment' });
@@ -39,11 +37,9 @@ const addNewEquipment = async (req, res) => {
 const updateEquipmentById = async (req, res) => {
     let { make, model, description, daily_rate, id } = req.body;
     try {
-        const [updatedEq] = await db.query(
-            'UPDATE equipment SET make = ?, model = ?, description = ?, daily_rate = ? WHERE id = ?',
-            [make, model, description, daily_rate, id]
-        );
-        res.send({ message: 'Equipment updated'});
+        const [updatedEq] = await con.updateEquipment(make, model, description, daily_rate, id);
+        res.send(updatedEq);
+        res.send({ message: 'Equipment updated' });
     } catch (error) {
         console.error(error);
         res.send({ message: 'Error updating equipment' });
@@ -53,8 +49,9 @@ const updateEquipmentById = async (req, res) => {
 const removeEquipmentById = async (req, res) => {
     const id = Number(req.params.id);
     try {
-        const [deleteEq] = await db.query('DELETE FROM equipment WHERE id = ?', [id]);
-        res.send({ message: 'Equipment deleted'});
+        const [deleteEq] = await con.deleteEquipment([id]);
+        res.send(deleteEq);
+        res.send({ message: 'Equipment deleted' });
     } catch (error) {
         console.error(error);
         res.send({ message: 'Error deleting equipment' });

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const db = require('../models/db.js');
+const db = require('../config/db.js');
 
 const login = async (req, res) => {
     let first_name = req.body.first_name;
